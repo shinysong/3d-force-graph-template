@@ -6,7 +6,7 @@
 - 사용 데이터: [전국관광지정보표준데이터](https://www.data.go.kr/data/15021141/standard.do)
 
 ## 1. 프로젝트 소개
-
+![demo](./demo.jpg)
 - 3D Force Graph를 이용한 시각화 예제
   - 3D Force Graph는 3D 공간에 노드와 링크를 표현하는 시각화 라이브러리이고, 원본 깃헙에 예제가 다양하게 존재함
 - CSV 파일을 읽어와서 3D Force Graph에 사용하는 JSON으로 변환하는 코드
