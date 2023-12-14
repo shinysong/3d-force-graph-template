@@ -1,0 +1,96 @@
+<head>
+  <style>
+    body {
+      margin: 0;
+    }
+    #infoBox {
+      position: fixed;
+      top: 0;
+      left: 0px;
+      width: 23%;
+      max-width: 25%;
+      overflow: auto;
+      max-height: 100%;
+      overflow-x: hidden;
+      text-align: center;
+      font-size: 14px;
+      padding: 10px;
+      color: #fff;
+      border-right: 3px solid hsl(261, 74%, 71%);
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    #infoBox::-webkit-scrollbar {
+      width: 10px;
+    }
+    #infoBox::-webkit-scrollbar-thumb {
+      background-color: grey;
+      border-radius: 10px;
+    }
+    #infoBox::-webkit-scrollbar-track {
+      background-color: rgb(202, 202, 209);
+      border-radius: 10px;
+      box-shadow: inset 0px 0px 5px white;
+    }
+  </style>
+
+  <script src="//unpkg.com/3d-force-graph"></script>
+  <!--  <script src="../../dist/3d-force-graph.js"></script>-->
+</head>
+
+<body>
+  <div id="3d-graph"></div>
+  <div id="infoBox">노드에 대한 정보가 표시됩니다</div>
+</body>
+<script>
+  const elem = document.getElementById("3d-graph");
+  let infoBoxElement = document.getElementById("infoBox");
+
+  const Graph = ForceGraph3D()(elem)
+    .jsonUrl("data/data.json") // data.json 파일을 불러옴
+    .nodeAutoColorBy("id") // id를 기준으로 랜덤 색상 지정
+    .nodeRelSize(6) // 노드 크기
+    .linkCurvature(0.2) // 곡률
+    .nodeLabel((node) => {
+      if (node.관광지명) {
+        return `${node.관광지명}`;
+      } else {
+        return node.name; // 제공기관 노드의 경우 name 표시
+      }
+    })
+    .onNodeClick((node) => {
+      // 클릭 시 infoBox에 정보 표시
+      createInfoBox(node);
+      // Aim at node from outside it
+      const distance = 100;
+      const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+
+      const newPos =
+        node.x || node.y || node.z
+          ? {
+              x: node.x * distRatio,
+              y: node.y * distRatio,
+              z: node.z * distRatio,
+            }
+          : { x: 0, y: 0, z: distance }; // special case if node is in (0,0,0)
+
+      Graph.cameraPosition(
+        newPos, // new position
+        node, // lookAt ({ x, y, z })
+        3000 // ms transition duration
+      );
+    });
+
+  // 클릭 시 infoBox에 정보 표시하는 함수
+  function createInfoBox(node) {
+    console.log("node", node);
+    if (infoBoxElement !== null) {
+      infoBoxElement.innerHTML = ""; // Clear existing content
+      // infoBox 초기화
+      // node의 모든 key와 value를 p 태그로 표시
+      Object.keys(node).forEach((key) => {
+        let p = `<p><b>${key}</b>: ${node[key]}</p>`;
+        infoBoxElement.innerHTML += p;
+      });
+    }
+  }
+</script>
